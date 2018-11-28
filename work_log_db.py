@@ -18,7 +18,7 @@ class Entry(Model):
     task_name = CharField(max_length=255)
     task_time = IntegerField(default=0)
     add_notes = TextField(default='') # Allows for any length of text.
-    timestamp = DateTimeField(default=datetime.datetime.now) 
+    timestamp = DateField(default=datetime.date.today())
 
     class Meta:
         database = db
@@ -53,7 +53,11 @@ def add_entry():
     clear_screen()
     add_name = input("Please enter your name:  ")
     add_task = input("Please enter the task at hand:  ")
-    add_time = int(input("Please enter the task's length:  "))
+    try:
+        add_time = int(input("Please enter the task's length:  "))
+    except ValueError:
+        print("Please enter a digit value only")
+        add_time = int(input("Please enter the task's length:   "))
     user_notes = input("Any additional notes for the task:   ")
 
     if all([add_name, add_task, add_time, user_notes]):
@@ -150,7 +154,7 @@ def exact_search():
         if search.strip() == '':
             print("Please enter text to be searched.")
             search = None
-    query = Entry.select().where((Entry.user_name.contains(search)) | (Entry.add_notes.contains(search)))
+    query = Entry.select().where((Entry.task_name.contains(search)) | (Entry.add_notes.contains(search)))
     for res in query:
         search_result.append(res)
     if len(search_result) == 0:
@@ -218,6 +222,8 @@ def date_search():
             print("Not a valid selection. Please enter 1 or 2.")
             searched = None
     if searched == '2':
+        print("Please enter a beginning date in MM/DD/YYYY format")
+        date_list(first_search_date)
         print("Please enter an end date in MM/DD/YYYY format")
         while not second_search_date:
             date_list(second_search_date)
@@ -327,6 +333,6 @@ def delete_entry(row):
 
 
 if __name__ == "__main__":
-    initalize()
+    initialize()
     user_menu()
     
